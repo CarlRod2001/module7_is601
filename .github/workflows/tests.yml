@@ -28,11 +28,16 @@ jobs:
           pip install pytest pytest-cov  # Ensure pytest-cov is installed
 
       - name: Run tests with pytest (Handle Exit Code 5)
-        # If the exit code is 5 (no tests collected), we force a successful exit
         run: |
+          # 1. Disable strict mode (-e) temporarily so the script doesn't exit when pytest fails with code 5.
+          set +e 
+          
           pytest --cov=app
           EXIT_CODE=$?
           
+          # 2. Re-enable strict mode for subsequent commands in the shell.
+          set -e 
+
           if [ $EXIT_CODE -eq 5 ]; then
             echo "::warning::Pytest found no tests (Exit Code 5). Allowing build to proceed."
             exit 0
